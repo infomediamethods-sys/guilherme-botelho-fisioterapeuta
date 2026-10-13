@@ -14,6 +14,10 @@
     barra.dataset.visivel = 'true'; /* o CSS (.whatsapp-fixo.barra-fixa { transform: none }) já a mantém no lugar */
   }
 
+  /* Rolagem suave mais responsiva: o Lenis do template (main.js, lerp 0.1) parecia "travado" para o Armin;
+     0.15 segue a rolagem mais de perto, sem perder a suavidade (13/10/2026). main.js continua sem edição. */
+  if (window.__lenis) window.__lenis.options.lerp = 0.15;
+
   /* Menu do celular: o hambúrguer também fecha (vira ×) e a rolagem suave para enquanto aberto */
   var botaoMenu = document.querySelector('[data-abrir-menu]');
   var menu = document.querySelector('.menu-celular');

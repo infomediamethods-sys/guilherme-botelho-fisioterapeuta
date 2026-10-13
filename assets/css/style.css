@@ -343,6 +343,7 @@ h1 em, h2 em, .rodape__frase em { font-style: italic; font-weight: 300; color: v
   position: relative; width: min(100%, 300px); aspect-ratio: 3 / 4; justify-self: start;
   border-radius: var(--raio-card); background: var(--mint-light);
 }
+@media (max-width: 899px) { .mapa__corpo { justify-self: center; } } /* celular e tablet: boneco centralizado (pedido do Armin, 13/10/2026) */
 .corpo { position: absolute; inset: 0; }
 .corpo__parte { position: absolute; background: var(--mint); border: 1px solid rgba(42, 138, 133, .22); }
 .corpo__parte--cabeca { left: 40.5%; top: 6%; width: 19%; aspect-ratio: 1; border-radius: 50%; }
