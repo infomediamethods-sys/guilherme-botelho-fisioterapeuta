@@ -278,6 +278,17 @@ h1 em, h2 em, .rodape__frase em { font-style: italic; font-weight: 300; color: v
 @media (max-width: 374px) {
   .heroi .h1 { font-size: 2.5rem; } /* 320–374: 40px para o H1 caber em 2 linhas */
 }
+/* Celular e tablet (< 900): foto centralizada entre o H1 e o texto de apoio (pedido do Armin, 13/10/2026) */
+@media (max-width: 899px) {
+  .heroi__grade { display: flex; flex-direction: column; gap: 0; }
+  .heroi__texto { display: contents; }
+  .heroi .chip { order: 1; align-self: flex-start; }
+  .heroi__titulo { order: 2; }
+  .heroi__midia { order: 3; align-self: center; margin-top: var(--space-6); }
+  .heroi__apoio { order: 4; margin-top: var(--space-6); }
+  .heroi__assinatura { order: 5; }
+  .heroi__acoes { order: 6; }
+}
 @media (min-width: 900px) {
   .heroi { padding-block: var(--space-8) var(--space-9); }
   .heroi__grade { grid-template-columns: minmax(360px, 6fr) 6fr; align-items: center; gap: var(--space-7); }
