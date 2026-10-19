@@ -5,14 +5,29 @@
   document.documentElement.classList.add('js');
   var reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* Rolagem: UM canal só para tudo que reage à rolagem (regra do Armin, 19/10/2026: rolagem leve no celular).
+     window.aoRolar(fn) chama fn({scroll, progress}) no máximo uma vez por quadro, pelo Lenis quando ele existe
+     (computador) ou pelo scroll nativo (celular). Dentro de fn: só trocar classe/atributo ou escrever transform/opacity.
+     NUNCA medir (getBoundingClientRect, offsetTop, scrollHeight) dentro de fn: meça fora, uma vez, e remeça no resize. */
+  var ouvintes = [], agendado = false;
+  function disparar() {
+    agendado = false;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var y = window.__lenis ? window.__lenis.scroll : window.scrollY;
+    var dados = { scroll: y, progress: max > 0 ? Math.min(1, Math.max(0, y / max)) : 0 };
+    for (var i = 0; i < ouvintes.length; i++) ouvintes[i](dados);
+  }
+  function pedir() { if (!agendado) { agendado = true; requestAnimationFrame(disparar); } }
+  window.addEventListener('scroll', pedir, { passive: true });
+  window.aoRolar = function (fn) { ouvintes.push(fn); pedir(); };
+
   /* Cabeçalho: marca rolagem e mede a altura (usada no scroll-margin das âncoras) */
   var header = document.querySelector('[data-header]');
   if (header) {
     var medir = function () { document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px'); };
-    var rolar = function () { header.toggleAttribute('data-rolado', window.scrollY > 80); };
-    medir(); rolar();
+    medir();
     window.addEventListener('resize', medir);
-    window.addEventListener('scroll', rolar, { passive: true });
+    window.aoRolar(function (d) { header.toggleAttribute('data-rolado', d.scroll > 80); });
   }
 
   /* Menu de celular: abre, fecha, Esc, foco */
@@ -50,24 +65,44 @@
     itens.forEach(function (el) { obs.observe(el); });
   }
 
-  /* Rolagem suave (Lenis, assets/js/lenis.min.js), no computador E no celular (decisão do Armin, 06/10/2026).
-     Desligada com prefers-reduced-motion. Sem Lenis carregado, o site rola normal. */
-  if (!reduzir && window.Lenis) {
-    var lenis = new window.Lenis({ lerp: 0.1, smoothWheel: true, syncTouch: true, syncTouchLerp: 0.085, touchInertiaExponent: 1.7, anchors: { offset: -(header ? header.offsetHeight : 0) } });
+  /* Rolagem suave (Lenis, assets/js/lenis.min.js) SÓ com mouse (computador). No celular a rolagem é a nativa
+     (regra do Armin, 19/10/2026: o syncTouch do Lenis reimplementa o toque em JS e deixava a rolagem lenta e
+     travada no iPhone). Desligada com prefers-reduced-motion. Sem Lenis carregado, o site rola normal. */
+  var mouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!reduzir && mouse && window.Lenis) {
+    var lenis = new window.Lenis({ lerp: 0.1, smoothWheel: true, syncTouch: false, anchors: { offset: -(header ? header.offsetHeight : 0) } });
     var quadro = function (t) { lenis.raf(t); requestAnimationFrame(quadro); };
     requestAnimationFrame(quadro);
     window.__lenis = lenis;
+    lenis.on('scroll', pedir);
   }
 
-  /* Botão fixo de WhatsApp (celular): aparece depois da primeira tela, em qualquer página */
-  var fixo = document.querySelector('.whatsapp-fixo');
-  if (fixo) {
-    var alvo = document.querySelector('[data-heroi]') || document.querySelector('main > :first-child');
-    var mostrar = function () {
-      var limite = alvo ? alvo.getBoundingClientRect().bottom : window.innerHeight * 0.6;
-      fixo.dataset.visivel = limite < 0 || window.scrollY > window.innerHeight * 0.6 ? 'true' : 'false';
+  /* Imagens de cima para baixo (regra do Armin, 19/10/2026): depois que a primeira tela carregou (evento load),
+     as imagens com loading="lazy" são carregadas uma por vez, na ordem da página, em tempo ocioso. Quando a pessoa
+     rola, a imagem já está no cache: nada "aparece atrasado". Com economia de dados ligada, fica no lazy nativo. */
+  var conexao = navigator.connection || {};
+  if (!conexao.saveData) {
+    var fila = Array.prototype.slice.call(document.querySelectorAll('img[loading="lazy"]'));
+    var aquecer = function () {
+      var img = fila.shift();
+      if (!img) return;
+      if (img.complete && img.naturalWidth) return aquecer();
+      img.addEventListener('load', aquecer, { once: true });
+      img.addEventListener('error', aquecer, { once: true });
+      img.loading = 'eager';
     };
-    mostrar();
-    window.addEventListener('scroll', mostrar, { passive: true });
+    window.addEventListener('load', function () { (window.requestIdleCallback || function (f) { setTimeout(f, 300); })(aquecer); });
+  }
+
+  /* Botão fixo de WhatsApp (celular, modo A da §0): com data-sempre fica visível do topo ao fim */
+  var fixo = document.querySelector('.whatsapp-fixo');
+  if (fixo && fixo.hasAttribute('data-sempre')) fixo.dataset.visivel = 'true';
+  else if (fixo) {
+    var alvo = document.querySelector('[data-heroi]') || document.querySelector('main > :first-child');
+    var fimHeroi = 0;
+    var medirHeroi = function () { fimHeroi = alvo ? alvo.offsetTop + alvo.offsetHeight : window.innerHeight * 0.6; };
+    medirHeroi();
+    window.addEventListener('resize', medirHeroi);
+    window.aoRolar(function (d) { fixo.dataset.visivel = d.scroll > Math.min(fimHeroi, window.innerHeight * 0.6) ? 'true' : 'false'; });
   }
 })();

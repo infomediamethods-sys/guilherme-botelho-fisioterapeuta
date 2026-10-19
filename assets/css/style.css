@@ -120,8 +120,7 @@ h1 em, h2 em, .rodape__frase em { font-style: italic; font-weight: 300; color: v
   border: 1.5px solid transparent; border-radius: var(--raio-pilula);
   font-family: var(--fonte-texto); font-size: var(--fs-botao); font-weight: 500; line-height: 1.2;
   text-decoration: none; text-align: center;
-  transition: transform var(--dur-hover) var(--ease-ref), background-color var(--dur-hover) var(--ease-ref),
-    color var(--dur-hover) var(--ease-ref), border-color var(--dur-hover) var(--ease-ref), box-shadow var(--dur-hover) var(--ease-ref);
+  transition: transform var(--dur-hover) var(--ease-ref), background-color var(--dur-hover) var(--ease-ref), color var(--dur-hover) var(--ease-ref), border-color var(--dur-hover) var(--ease-ref);
 }
 .botao .icone { transition: transform var(--dur-hover) var(--ease-ref); }
 .botao--primario { background: var(--ink); color: var(--mint); }
@@ -396,14 +395,13 @@ h1 em, h2 em, .rodape__frase em { font-style: italic; font-weight: 300; color: v
 .caso {
   display: grid; align-content: start; justify-items: start;
   padding: var(--space-5); border: 1px solid transparent; border-radius: var(--raio-card); background: var(--paper);
-  transition: transform var(--dur-card) var(--ease-ref), border-color var(--dur-card) var(--ease-ref),
-    box-shadow var(--dur-card) var(--ease-ref), background-color var(--dur-card) var(--ease-ref);
+  transition: transform var(--dur-card) var(--ease-ref), border-color var(--dur-card) var(--ease-ref), background-color var(--dur-card) var(--ease-ref);
 }
 .caso:hover { transform: translateY(-6px); border-color: var(--teal); box-shadow: var(--sombra-2); }
 .caso__num { font-family: var(--fonte-titulo); font-style: italic; font-weight: 300; font-size: 1.875rem; line-height: 1; color: var(--accent-texto); }
 .caso__titulo { margin-top: var(--space-4); }
 .caso__curto { margin-top: var(--space-2); max-width: 34em; }
-.caso__mais { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows var(--dur-card) var(--ease-ref), visibility var(--dur-card); }
+.caso__mais { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: visibility var(--dur-card); }
 .caso__mais-dentro { overflow: hidden; display: grid; gap: var(--space-3); justify-items: start; }
 .caso__mais-dentro p { max-width: 34em; padding-top: var(--space-3); color: var(--ink); }
 .caso[data-aberto="true"] { background: var(--mint); }
@@ -412,7 +410,7 @@ h1 em, h2 em, .rodape__frase em { font-style: italic; font-weight: 300; color: v
   display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-3); padding: 0;
   border: 0; background: transparent; color: var(--accent-texto);
   font-size: var(--fs-rotulo); font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
-  transition: gap var(--dur-hover) var(--ease-ref);
+  transition: none;
 }
 .caso__abrir:hover { gap: var(--space-3); }
 .caso__abrir .icone { transition: transform var(--dur-card) var(--ease-ref); }
@@ -449,7 +447,7 @@ html:not(.js) .caso__abrir { display: none; }
 .sobre__grade { display: grid; gap: var(--space-6); }
 .cartao-pessoa {
   overflow: hidden; border-radius: var(--raio-card); background: var(--paper);
-  transition: transform var(--dur-card) var(--ease-ref), box-shadow var(--dur-card) var(--ease-ref);
+  transition: transform var(--dur-card) var(--ease-ref);
 }
 .cartao-pessoa:hover { transform: translateY(-6px); box-shadow: var(--sombra-2); }
 .cartao-pessoa__foto { aspect-ratio: 4 / 5; overflow: hidden; }
@@ -523,7 +521,7 @@ html:not(.js) .caso__abrir { display: none; }
   background: var(--paper); color: var(--ink); transition: transform .3s var(--ease-ref), background-color .3s, color .3s;
 }
 .faq__botao[aria-expanded="true"] .faq__icone { transform: rotate(45deg); background: var(--ink); color: var(--paper); }
-.faq__resposta { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows var(--dur-card) var(--ease-ref), visibility var(--dur-card); }
+.faq__resposta { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: visibility var(--dur-card); }
 .faq__resposta[data-aberto="true"] { grid-template-rows: 1fr; visibility: visible; }
 html:not(.js) .faq__resposta { grid-template-rows: 1fr; visibility: visible; }
 .faq__dentro { overflow: hidden; display: grid; gap: var(--space-2); justify-items: start; }
@@ -670,4 +668,10 @@ html:not(.js) .faq__resposta { grid-template-rows: 1fr; visibility: visible; }
   .botao:hover, .caso:hover, .cartao-pessoa:hover, .cabecalho__cta:hover,
   .botao:hover .icone, .link:hover .icone, .mapa__ponto:hover .mapa__marcador { transform: none; }
   .mapa__ponto[aria-pressed="true"] .mapa__marcador { transform: none; }
+}
+
+
+/* Regra do Armin, 19/10/2026 (§0 "Rolagem leve no celular"): sem vidro desfocado no celular; fundo quase opaco. Aplicado por aplicar-carregamento.mjs. */
+@media (max-width: 899px) {
+  .cabecalho { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(200, 230, 226, 0.96); }
 }
