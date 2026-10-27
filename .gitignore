@@ -18,6 +18,9 @@ LIBERADO-PARA-INDEXAR
 assets/img/_orig/
 # Marcador de aprovação do Armin (lido pelo publicador automático do Mac)
 APROVADO*
+VEREDITO-REFERENCIA*
+REPROVADO.md
+_src/
 copy.md
 copy-proposta.md
 ajustes-cliente.md
